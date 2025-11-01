@@ -58,3 +58,10 @@ def show_names():
 
 if __name__ == '__main__':
     app.run()
+
+
+@app.route("/map")
+def map_view():
+    entries = NameEntry.query.all()
+    return render_template("map.html", entries=entries)
+
