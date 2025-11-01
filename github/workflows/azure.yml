@@ -1,4 +1,4 @@
-name: Deploy Python app to Azure Web App
+name: LostPet Azure Deployment
 
 on:
   push:
