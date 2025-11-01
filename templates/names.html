@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pets list</title>
+</head>
+<body>
+    <h1>List of pets</h1>
+    <ul>
+        {% for entry in entries %}
+            <li>{{ entry.name }}</li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('home') }}">Back to Home</a>
+</body>
+</html>
