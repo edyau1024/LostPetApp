@@ -28,3 +28,8 @@ def submit_name():
 
 if __name__ == '__main__':
     app.run()
+
+@app.route("/names")
+def show_names():
+    entries = NameEntry.query.all()
+    return render_template("names.html", entries=entries)
