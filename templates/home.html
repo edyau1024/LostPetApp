@@ -14,5 +14,28 @@
     <a href="{{ url_for('show_names') }}">
     <button>View submitted pets</button>
 </a>
+    <br>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA1AUJ3B9wvlldOPhB_RmRaCmIMbRo0Z0k"></script>
+    <script>
+        function initMap() {
+            const center = { lat: 49.2827, lng: -123.1207 }; // Vancouver
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 10,
+                center: center,
+            });
+
+            {% for entry in entries %}
+            new google.maps.Marker({
+                position: { lat: {{ entry.lat }}, lng: {{ entry.lng }} },
+                map: map,
+                title: "{{ entry.pet_name }}",
+            });
+            {% endfor %}
+        }
+    </script>
+</head>
+<body onload="initMap()">
+    <h1>Pet Locations</h1>
+    <div id="map" style="height: 500px; width: 100%;"></div>
 </body>
 </html>
