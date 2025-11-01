@@ -29,7 +29,9 @@ def home():
 @app.route("/submit", methods=["GET", "POST"])
 def submit_name():
     if request.method == "POST":
-        name = request.form["name"]
+        pet_name = request.form["pet_name"]
+        owner_name = request.form["owner_name"]
+        location = request.form["location"]
         image = request.files.get("image")
 
         filename = None
@@ -37,7 +39,12 @@ def submit_name():
             filename = secure_filename(image.filename)
             image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-        new_entry = NameEntry(name=name, image_filename=filename)
+        new_entry = NameEntry(
+            pet_name=pet_name,
+            owner_name=owner_name,
+            location=location,
+            image_filename=filename
+        )
         db.session.add(new_entry)
         db.session.commit()
         return redirect("/submit")
