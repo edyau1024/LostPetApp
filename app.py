@@ -65,3 +65,16 @@ def map_view():
     entries = NameEntry.query.all()
     return render_template("map.html", entries=entries)
 
+from geopy.geocoders import Nominatim
+
+@app.route("/submit", methods=["GET", "POST"])
+def submit_name():
+    if request.method == "POST":
+        location_text = request.form["location"]
+        geolocator = Nominatim(user_agent="lostpet")
+        location = geolocator.geocode(location_text)
+
+        lat = location.latitude if location else None
+        lng = location.longitude if location else None
+
+        # Save lat/lng along with other form data
