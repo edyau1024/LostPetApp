@@ -1,6 +1,7 @@
+from flask import Flask, request, redirect, render_template
 from flask_sqlalchemy import SQLAlchemy
-from flask import request, redirect, render_template
 
+app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///names.db'
 db = SQLAlchemy(app)
 
@@ -11,17 +12,9 @@ class NameEntry(db.Model):
 with app.app_context():
     db.create_all()
 
-
-from flask import Flask
-app = Flask(__name__)
-
 @app.route('/')
 def home():
     return render_template('home.html')
-
-if __name__ == '__main__':
-    app.run()
-
 
 @app.route("/submit", methods=["GET", "POST"])
 def submit_name():
@@ -32,4 +25,6 @@ def submit_name():
         db.session.commit()
         return redirect("/submit")
     return render_template("form.html")
-    
+
+if __name__ == '__main__':
+    app.run()
