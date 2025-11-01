@@ -68,8 +68,8 @@ def show_names():
     return render_template("names.html", entries=entries)
 
 
-@app.route("/map")
-def map_view():
+@app.route('/')
+def home():
     entries = NameEntry.query.all()
     return render_template("map.html", entries=entries)
 
