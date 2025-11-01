@@ -17,6 +17,8 @@ class NameEntry(db.Model):
     pet_name = db.Column(db.String(100), nullable=False)
     owner_name = db.Column(db.String(100), nullable=False)
     location = db.Column(db.String(100), nullable=False)
+    lat = db.Column(db.Float)
+    lng = db.Column(db.Float)
     image_filename = db.Column(db.String(200))
 
 with app.app_context():
@@ -26,13 +28,20 @@ with app.app_context():
 def home():
     return render_template('home.html')
 
+from geopy.geocoders import Nominatim
+
 @app.route("/submit", methods=["GET", "POST"])
 def submit_name():
     if request.method == "POST":
         pet_name = request.form["pet_name"]
         owner_name = request.form["owner_name"]
-        location = request.form["location"]
+        location_text = request.form["location"]
         image = request.files.get("image")
+
+        geolocator = Nominatim(user_agent="lostpet")
+        location = geolocator.geocode(location_text)
+        lat = location.latitude if location else None
+        lng = location.longitude if location else None
 
         filename = None
         if image and image.filename:
@@ -42,7 +51,9 @@ def submit_name():
         new_entry = NameEntry(
             pet_name=pet_name,
             owner_name=owner_name,
-            location=location,
+            location=location_text,
+            lat=lat,
+            lng=lng,
             image_filename=filename
         )
         db.session.add(new_entry)
@@ -65,16 +76,4 @@ def map_view():
     entries = NameEntry.query.all()
     return render_template("map.html", entries=entries)
 
-from geopy.geocoders import Nominatim
 
-@app.route("/submit", methods=["GET", "POST"])
-def submit_name():
-    if request.method == "POST":
-        location_text = request.form["location"]
-        geolocator = Nominatim(user_agent="lostpet")
-        location = geolocator.geocode(location_text)
-
-        lat = location.latitude if location else None
-        lng = location.longitude if location else None
-
-        # Save lat/lng along with other form data
