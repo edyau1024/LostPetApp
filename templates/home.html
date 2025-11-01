@@ -2,19 +2,6 @@
 <html>
 <head>
     <title>LostPetApp</title>
-</head>
-<body>
-    <h1>Welcome to the Lost Pets app</h1><br>
-    
-    <a href="{{ url_for('submit_name') }}">
-        <button>Enter new pet</button>
-    </a>
-    <br>
-    <br>
-    <a href="{{ url_for('show_names') }}">
-    <button>View submitted pets</button>
-</a>
-    <br>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA1AUJ3B9wvlldOPhB_RmRaCmIMbRo0Z0k"></script>
     <script>
         function initMap() {
@@ -29,7 +16,7 @@
             new google.maps.Marker({
                 position: { lat: {{ entry.lat }}, lng: {{ entry.lng }} },
                 map: map,
-                title: "{{ entry.pet_name }}",
+                title: "{{ entry.pet_name }}"
             });
             {% endif %}
             {% endfor %}
@@ -37,9 +24,18 @@
     </script>
 </head>
 <body onload="initMap()">
-    <h1>Welcome to LostPet</h1>
+    <h1>Welcome to the Lost Pets app</h1>
+    
+    <a href="{{ url_for('submit_name') }}">
+        <button>Enter new pet</button>
+    </a>
+    <br><br>
+    <a href="{{ url_for('show_names') }}">
+        <button>View submitted pets</button>
+    </a>
+    <br><br>
+
     <p>View reported lost pets on the map below:</p>
     <div id="map" style="height: 500px; width: 100%;"></div>
-
 </body>
 </html>
