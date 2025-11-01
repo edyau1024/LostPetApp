@@ -10,6 +10,18 @@
             <li>{{ entry.name }}</li>
         {% endfor %}
     </ul>
+    <ul>
+    {% for entry in entries %}
+        <li>
+            {{ entry.name }}
+            {% if entry.image_filename %}
+                <br>
+                <img src="{{ url_for('static', filename='uploads/' + entry.image_filename) }}" width="150">
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+
     <a href="{{ url_for('home') }}">Back to Home</a>
 </body>
 </html>
