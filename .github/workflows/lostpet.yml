@@ -42,9 +42,6 @@ jobs:
         with:
           name: python-app
 
-      - name: Run startup script
-        run: bash startup.sh
-
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
