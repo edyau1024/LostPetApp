@@ -14,8 +14,10 @@ db = SQLAlchemy(app)
 
 class NameEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    image_filename = db.Column(db.String(200))  # New field
+    pet_name = db.Column(db.String(100), nullable=False)
+    owner_name = db.Column(db.String(100), nullable=False)
+    location = db.Column(db.String(100), nullable=False)
+    image_filename = db.Column(db.String(200))
 
 with app.app_context():
     db.create_all()
