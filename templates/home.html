@@ -7,7 +7,12 @@ om<!DOCTYPE html>
     <h1>Welcome to the Lost Pets app</h1>
     <p>Enter your pet's name:</p>
     <a href="{{ url_for('submit_name') }}">
-        <button>Submit Your Name</button>
+        <button>Submit pet name</button>
     </a>
+    <br>
+    <br>
+    <a href="{{ url_for('show_names') }}">
+    <button>View submitted pets</button>
+</a>
 </body>
 </html>
