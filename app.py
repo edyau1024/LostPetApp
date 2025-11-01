@@ -20,10 +20,18 @@ def home():
 def submit_name():
     if request.method == "POST":
         name = request.form["name"]
-        new_entry = NameEntry(name=name)
+        image = request.files.get("image")
+
+        filename = None
+        if image and image.filename:
+            filename = secure_filename(image.filename)
+            image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+        new_entry = NameEntry(name=name, image_filename=filename)
         db.session.add(new_entry)
         db.session.commit()
         return redirect("/submit")
+
     return render_template("form.html")
 
 if __name__ == '__main__':
