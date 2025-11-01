@@ -71,7 +71,7 @@ def show_names():
 @app.route('/')
 def home():
     entries = NameEntry.query.all()
-    return render_template("map.html", entries=entries)
+    return render_template("home.html", entries=entries)
 
 if __name__ == '__main__':
     app.run()
