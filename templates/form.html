@@ -4,11 +4,12 @@
     <title>Submit Pet Name</title>
 </head>
 <body>
-    <h1>Enter your pet's name</h1>
+    <h1>Submit new pet</h1><br>
+    Enter pet name:<br>
 <form method="POST" enctype="multipart/form-data">
-    <input type="text" name="name" required>
+    <input type="text" name="name" required><br>
     <input type="file" name="image">
-    <button type="submit">Submit</button>
+    <button type="submit">Upload photo</button>
 </form>
     <br>
     <a href="{{ url_for('home') }}">Back to Home</a>
