@@ -33,3 +33,8 @@ if __name__ == '__main__':
 def show_names():
     entries = NameEntry.query.all()
     return render_template("names.html", entries=entries)
+
+class NameEntry(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    image_filename = db.Column(db.String(200))  # New field
