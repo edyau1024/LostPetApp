@@ -5,23 +5,20 @@
 </head>
 <body>
     <h1>List of pets</h1>
-    <ul>
-        {% for entry in entries %}
-            <li>{{ entry.name }}</li>
-        {% endfor %}
-    </ul>
+
     <ul>
     {% for entry in entries %}
         <li>
-            {{ entry.name }}
+            <strong>Pet:</strong> {{ entry.pet_name }}<br>
+            <strong>Owner:</strong> {{ entry.owner_name }}<br>
+            <strong>Location:</strong> {{ entry.location }}<br>
             {% if entry.image_filename %}
-                <br>
-                <img src="{{ url_for('static', filename='uploads/' + entry.image_filename) }}" width="150">
+                <img src="{{ url_for('static', filename='uploads/' + entry.image_filename) }}" width="150"><br>
             {% endif %}
         </li>
     {% endfor %}
 </ul>
-
+    <br>
     <a href="{{ url_for('home') }}">Back to Home</a>
 </body>
 </html>
