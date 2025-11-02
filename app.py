@@ -26,7 +26,7 @@ with app.app_context():
 
 import googlemaps
 
-gmaps = googlemaps.Client(key=os.environ.get("AIzaSyBH5uoRbtVVg2fmWtL5INAed-pTSqrOuk8"))
+gmaps = googlemaps.Client(key=os.environ.get("GOOGLE_GEOCODING_KEY"))
 
 @app.route("/submit", methods=["GET", "POST"])
 def submit_name():
@@ -87,8 +87,10 @@ def home():
 def test_geocode():
     try:
         result = gmaps.geocode("123 Main St, Vancouver, BC")
+        app.logger.info(f"Test geocode result: {result}")
         return str(result[0]["geometry"]["location"])
     except Exception as e:
+        app.logger.error(f"Geocoding error: {e}")
         return f"Geocoding error: {e}", 500
         
 @app.route("/ping")
