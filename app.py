@@ -58,6 +58,11 @@ def submit_name():
 
     return render_template("form.html")
 
+@app.route("/names", endpoint="show_names")
+def show_names():
+    entries = NameEntry.query.all()
+    return render_template("names.html", entries=entries)
+
 @app.route('/')
 def home():
     try:
