@@ -6,22 +6,39 @@
 <body>
     <h1>List of pets</h1>
 
-    <ul>
+    
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+  <thead style="background-color: #f2f2f2;">
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Address</th>
+      <th>Image</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
     {% for entry in entries %}
-        <li>
-            <strong>Pet:</strong> {{ entry.pet_name }}<br>
-            <strong>Owner:</strong> {{ entry.owner_name }}<br>
-            <strong>Location:</strong> {{ entry.location }}<br>
-            {% if entry.image_filename %}
-                <img src="{{ entry.image_filename }}" alt="Pet image" style="max-width:300px;"><br>
-            {% endif %}
-            <form action="{{ url_for('delete_entry', id=entry.id) }}" method="post" style="display:inline;">
-    <button type="submit" onclick="return confirm('Are you sure you want to delete this entry?');">Delete</button>
-</form>
-        </li>
+    <tr>
+      <td>{{ entry.id }}</td>
+      <td>{{ entry.name }}</td>
+      <td>{{ entry.address }}</td>
+      <td>
+        {% if entry.image_filename %}
+          <img src="{{ entry.image_filename }}" alt="Pet image" style="max-width:150px;">
+        {% else %}
+          No image
+        {% endif %}
+      </td>
+      <td>
+        <form action="{{ url_for('delete_entry', id=entry.id) }}" method="post" style="display:inline;">
+          <button type="submit" onclick="return confirm('Are you sure you want to delete this entry?');">Delete</button>
+        </form>
+      </td>
+    </tr>
     {% endfor %}
-</ul>
-    <br>
-    <a href="{{ url_for('home') }}">Back to Home</a>
+  </tbody>
+</table>
+    
 </body>
 </html>
