@@ -68,7 +68,6 @@ def submit_name():
         app.logger.error(f"Form submission error: {e}")
         return "Internal Server Error", 500
 
-
 @app.route("/names", endpoint="show_names")
 def show_names():
     entries = NameEntry.query.all()
