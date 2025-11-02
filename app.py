@@ -107,7 +107,14 @@ def test_geocode():
     except Exception as e:
         app.logger.error(f"Geocoding error: {e}")
         return f"Geocoding error: {e}", 500
-        
+
+@app.route('/delete/<int:id>', methods=['POST'])
+def delete_entry(id):
+    entry = NameEntry.query.get_or_404(id)
+    db.session.delete(entry)
+    db.session.commit()
+    return redirect(url_for('show_names'))
+    
 @app.route("/ping")
 def ping():
     return "pong"
