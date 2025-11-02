@@ -60,8 +60,12 @@ def submit_name():
 
 @app.route('/')
 def home():
-    entries = NameEntry.query.all()
-    return render_template("home.html", entries=entries)
+    try:
+        entries = NameEntry.query.all()
+        return render_template("home.html", entries=entries)
+    except Exception as e:
+        app.logger.error(f"Home page error: {e}")
+        return "Internal Server Error", 500
 
 @app.route("/ping")
 def ping():
