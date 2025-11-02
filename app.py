@@ -83,6 +83,14 @@ def home():
         app.logger.error(f"Home page error: {e}")
         return "Internal Server Error", 500
 
+@app.route("/test-geocode")
+def test_geocode():
+    try:
+        result = gmaps.geocode("123 Main St, Vancouver, BC")
+        return str(result[0]["geometry"]["location"])
+    except Exception as e:
+        return f"Geocoding error: {e}", 500
+        
 @app.route("/ping")
 def ping():
     return "pong"
