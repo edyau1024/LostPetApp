@@ -30,7 +30,8 @@ gmaps = googlemaps.Client(key="AIzaSyA1AUJ3B9wvlldOPhB_RmRaCmIMbRo0Z0k")
 
 @app.route("/submit", methods=["GET", "POST"])
 def submit_name():
-    if request.method == "POST":
+    try:
+        if request.method == "POST":
         pet_name = request.form["pet_name"]
         owner_name = request.form["owner_name"]
         location_text = request.form["location"]
@@ -61,6 +62,9 @@ def submit_name():
         return redirect("/submit")
 
     return render_template("form.html")
+    except Exception as e:
+        app.logger.error(f"Form submission error: {e}")
+        return "Internal Server Error", 500
 
 
 @app.route("/names", endpoint="show_names")
