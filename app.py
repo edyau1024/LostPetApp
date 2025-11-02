@@ -43,6 +43,8 @@ def submit_name():
         if geocode_result:
             lat = geocode_result[0]["geometry"]["location"]["lat"]
             lng = geocode_result[0]["geometry"]["location"]["lng"]
+else:
+    app.logger.warning(f"No geocode result for: {location_text}")
 
         filename = None
         if image and image.filename:
