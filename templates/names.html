@@ -13,7 +13,7 @@
             <strong>Owner:</strong> {{ entry.owner_name }}<br>
             <strong>Location:</strong> {{ entry.location }}<br>
             {% if entry.image_filename %}
-                <img src="{{ url_for('static', filename='uploads/' + entry.image_filename) }}" width="150"><br>
+                <img src="{{ entry.image_filename }}" alt="Pet image" style="max-width:300px;"><br>
             {% endif %}
         </li>
     {% endfor %}
