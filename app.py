@@ -24,7 +24,9 @@ class NameEntry(db.Model):
 with app.app_context():
     db.create_all()
 
-from geopy.geocoders import Nominatim
+import googlemaps
+
+gmaps = googlemaps.Client(key="AIzaSyA1AUJ3B9wvlldOPhB_RmRaCmIMbRo0Z0k")
 
 @app.route("/submit", methods=["GET", "POST"])
 def submit_name():
@@ -34,10 +36,12 @@ def submit_name():
         location_text = request.form["location"]
         image = request.files.get("image")
 
-        geolocator = Nominatim(user_agent="lostpet")
-        location = geolocator.geocode(location_text)
-        lat = location.latitude if location else None
-        lng = location.longitude if location else None
+        # Geocode using Google Maps
+        geocode_result = gmaps.geocode(location_text)
+        lat = lng = None
+        if geocode_result:
+            lat = geocode_result[0]["geometry"]["location"]["lat"]
+            lng = geocode_result[0]["geometry"]["location"]["lng"]
 
         filename = None
         if image and image.filename:
@@ -57,6 +61,7 @@ def submit_name():
         return redirect("/submit")
 
     return render_template("form.html")
+
 
 @app.route("/names", endpoint="show_names")
 def show_names():
