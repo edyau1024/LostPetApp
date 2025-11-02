@@ -63,6 +63,10 @@ def home():
     entries = NameEntry.query.all()
     return render_template("home.html", entries=entries)
 
+@app.route("/ping")
+def ping():
+    return "pong"
+    
 if __name__ == '__main__':
     app.run()
 
