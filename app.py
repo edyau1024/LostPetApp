@@ -46,10 +46,26 @@ def submit_name():
             else:
                 app.logger.warning(f"No geocode result for: {location_text}")
 
-            filename = None
+            image_url = None
+
+            from azure.storage.blob import BlobServiceClient
+            import uuid
+            
+            # Setup (place this near the top of your file, after imports)
+            blob_connection_string = os.environ.get("AZURE_STORAGE_CONNECTION_STRING")
+            blob_container_name = "images"
+            blob_service_client = BlobServiceClient.from_connection_string(blob_connection_string)
+            container_client = blob_service_client.get_container_client(blob_container_name)
+            
+            # Inside your POST handler:
             if image and image.filename:
                 filename = secure_filename(image.filename)
-                image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                unique_filename = f"{uuid.uuid4()}_{filename}"
+                blob_client = container_client.get_blob_client(unique_filename)
+                blob_client.upload_blob(image, overwrite=True)
+                image_url = f"https://{blob_service_client.account_name}.blob.core.windows.net/{blob_container_name}/{unique_filename}"
+            else:
+                image_url = None                        
 
             new_entry = NameEntry(
                 pet_name=pet_name,
@@ -57,7 +73,7 @@ def submit_name():
                 location=location_text,
                 lat=lat,
                 lng=lng,
-                image_filename=filename
+                image_filename=image_url
             )
             db.session.add(new_entry)
             db.session.commit()
