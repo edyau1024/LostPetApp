@@ -26,7 +26,7 @@ with app.app_context():
 
 import googlemaps
 
-gmaps = googlemaps.Client(key="AIzaSyA1AUJ3B9wvlldOPhB_RmRaCmIMbRo0Z0k")
+gmaps = googlemaps.Client(key=os.environ.get("AIzaSyBH5uoRbtVVg2fmWtL5INAed-pTSqrOuk8"))
 
 @app.route("/submit", methods=["GET", "POST"])
 def submit_name():
