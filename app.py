@@ -32,38 +32,38 @@ gmaps = googlemaps.Client(key="AIzaSyA1AUJ3B9wvlldOPhB_RmRaCmIMbRo0Z0k")
 def submit_name():
     try:
         if request.method == "POST":
-        pet_name = request.form["pet_name"]
-        owner_name = request.form["owner_name"]
-        location_text = request.form["location"]
-        image = request.files.get("image")
+            pet_name = request.form["pet_name"]
+            owner_name = request.form["owner_name"]
+            location_text = request.form["location"]
+            image = request.files.get("image")
+    
+            # Geocode using Google Maps
+            geocode_result = gmaps.geocode(location_text)
+            lat = lng = None
+            if geocode_result:
+                lat = geocode_result[0]["geometry"]["location"]["lat"]
+                lng = geocode_result[0]["geometry"]["location"]["lng"]
+            else:
+                app.logger.warning(f"No geocode result for: {location_text}")
 
-        # Geocode using Google Maps
-        geocode_result = gmaps.geocode(location_text)
-        lat = lng = None
-        if geocode_result:
-            lat = geocode_result[0]["geometry"]["location"]["lat"]
-            lng = geocode_result[0]["geometry"]["location"]["lng"]
-else:
-    app.logger.warning(f"No geocode result for: {location_text}")
+            filename = None
+            if image and image.filename:
+                filename = secure_filename(image.filename)
+                image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-        filename = None
-        if image and image.filename:
-            filename = secure_filename(image.filename)
-            image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
-        new_entry = NameEntry(
-            pet_name=pet_name,
-            owner_name=owner_name,
-            location=location_text,
-            lat=lat,
-            lng=lng,
-            image_filename=filename
-        )
-        db.session.add(new_entry)
-        db.session.commit()
-        return redirect("/submit")
-
-    return render_template("form.html")
+            new_entry = NameEntry(
+                pet_name=pet_name,
+                owner_name=owner_name,
+                location=location_text,
+                lat=lat,
+                lng=lng,
+                image_filename=filename
+            )
+            db.session.add(new_entry)
+            db.session.commit()
+            return redirect("/submit")
+    
+        return render_template("form.html")
     except Exception as e:
         app.logger.error(f"Form submission error: {e}")
         return "Internal Server Error", 500
