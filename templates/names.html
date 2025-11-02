@@ -10,12 +10,15 @@
 <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">
   <thead style="background-color: #f2f2f2;">
     <tr>
-      <th>ID</th>
-      <th>Pet's Name</th>
-      <th>Owner's Name</th>
-      <th>Location</th>
-      <th>Image</th>
-      <th>Actions</th>
+        <th>ID</th>
+        <th>Pet's Name</th>
+        <th>Owner's Name</th>
+        <th>Phone</th>
+        <th>Location Lost</th>
+        <th>Date Lost</th>
+        <th>Reward</th>      
+        <th>Image</th>
+        <th>Actions</th>
     </tr>
   </thead>
   <tbody>
@@ -24,7 +27,10 @@
       <td>{{ entry.id }}</td>
       <td>{{ entry.pet_name }}</td>
       <td>{{ entry.owner_name }}</td>
-      <td>{{ entry.location }}</td>
+    <td>{{ entry.phone_number }}</td>
+    <td>{{ entry.location }}</td>
+    <td>{{ entry.date_lost }}</td>
+    <td>${{ "%.2f"|format(entry.reward) }}</td>
       <td>
         {% if entry.image_filename %}
           <img src="{{ entry.image_filename }}" alt="Pet image" style="max-width:150px;">
