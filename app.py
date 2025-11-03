@@ -27,7 +27,7 @@ class NameEntry(db.Model):
 with app.app_context():
     db.create_all()
 
-import googlemaps #Testcomment
+import googlemaps
 
 gmaps = googlemaps.Client(key=os.environ.get("GOOGLE_GEOCODING_KEY"))
 
