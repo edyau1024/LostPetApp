@@ -30,7 +30,13 @@
     <td>{{ entry.phone_number }}</td>
     <td>{{ entry.location }}</td>
     <td>{{ entry.date_lost }}</td>
-    <td>${{ "%.2f"|format(entry.reward) }}</td>
+    <td>
+  {% if entry.reward is not none %}
+    ${{ "%.2f"|format(entry.reward) }}
+  {% else %}
+    —
+  {% endif %}
+</td>
       <td>
         {% if entry.image_filename %}
           <img src="{{ entry.image_filename }}" alt="Pet image" style="max-width:150px;">
