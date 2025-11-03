@@ -38,6 +38,10 @@ def submit_name():
             pet_name = request.form["pet_name"]
             owner_name = request.form["owner_name"]
             location_text = request.form["location"]
+            phone_number = request.form.get("phone_number")
+            date_lost = request.form.get("date_lost")
+            reward_raw = request.form.get("reward")
+            reward = float(reward_raw) if reward_raw else None
             image = request.files.get("image")
     
             # Geocode using Google Maps
@@ -76,7 +80,10 @@ def submit_name():
                 location=location_text,
                 lat=lat,
                 lng=lng,
-                image_filename=image_url
+                image_filename=image_url,
+                phone_number=phone_number,
+                date_lost=date_lost,
+                reward=reward
             )
             db.session.add(new_entry)
             db.session.commit()
