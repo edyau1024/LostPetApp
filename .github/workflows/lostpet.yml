@@ -49,5 +49,3 @@ jobs:
           slot-name: 'Production'
           publish-profile: ${{ secrets.AzureAppService_PublishProfile_1234567890abcdef }}
           package: .
-
-          startupCommand: gunicorn --bind=0.0.0.0 --timeout 600 app:app
