@@ -84,12 +84,12 @@
       componentRestrictions: { country: 'ca' }
     });
 
-    autocomplete.addListener('place_changed', function () {
-      const place = autocomplete.getPlace();
-      if (!place.geometry) {
-        alert("Please select a valid address from the suggestions.");
-        input.value = '';
-      }
+    // autocomplete.addListener('place_changed', function () {
+    //  const place = autocomplete.getPlace();
+    //  if (!place.geometry) {
+    //    alert("Please select a valid address from the suggestions.");
+    //    input.value = '';
+    //  }
     });
 
     // Prevent premature validation
