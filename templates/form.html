@@ -6,15 +6,12 @@
 <head>
     <title>Submit Pet Name</title>
     
-      <!-- Load Maps JavaScript API with Places and Web Components -->
-      <script
-        async
-        src="https://maps.googleapis.com/maps/api/js?key={{ google_api_key }}&libraries=places&v=beta"
-      ></script>
-      <script
-        async
-        src="https://maps.googleapis.com/maps/api/js?key={{ google_api_key }}&libraries=places&v=beta&modules=webcomponents"
-      ></script>
+    <!-- Load Maps API with Places and Web Components -->
+    <script
+      async
+      src="https://maps.googleapis.com/maps/api/js?key={{ google_api_key }}&libraries=places&v=beta&modules=webcomponents"
+    ></script>
+
 
 </head>
 <body>
@@ -51,16 +48,21 @@
     <input type="tel" name="phone_number" required><br>
         
     <label>Location Lost:</label>
+    <!-- Google Maps Autocomplete Component -->
     <gmp-place-autocomplete
       id="autocomplete"
       input-field-id="location"
       componentRestrictions='{"country": "ca"}'
     ></gmp-place-autocomplete>
     
+    <!-- Input field managed by the component -->
     <input id="location" name="location" type="text" placeholder="Enter address" autocomplete="off">
+    
+    <!-- Hidden fields for backend validation -->
     <input type="hidden" id="place_id" name="place_id">
     <input type="hidden" id="formatted_address" name="formatted_address">
     <p id="selected-address" style="font-weight: bold; color: green;"></p>
+
 
 
 <br>
