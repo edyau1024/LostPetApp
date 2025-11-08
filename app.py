@@ -1,3 +1,5 @@
+from flask import flash
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "default-secret")
 from flask import Flask, request, redirect, render_template, url_for
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
@@ -31,17 +33,36 @@ import googlemaps
 
 gmaps = googlemaps.Client(key=os.environ.get("GOOGLE_GEOCODING_KEY"))
 
+from azure.storage.blob import BlobServiceClient
+import uuid
+
+# Setup (place this near the top of your file, after imports)
+blob_connection_string = os.environ.get("AZURE_STORAGE_CONNECTION_STRING")
+blob_container_name = "images"
+blob_service_client = BlobServiceClient.from_connection_string(blob_connection_string)
+container_client = blob_service_client.get_container_client(blob_container_name)
+
 @app.route("/submit", methods=["GET", "POST"])
 def submit_name():
     try:
         if request.method == "POST":
-            pet_name = request.form["pet_name"]
+            pet_name = request.form.get("pet_name", "").strip()
+            if not pet_name:
+                flash("Pet name is required.")
+                return redirect("/submit")
+            if len(pet_name) < 2:
+                flash("Pet name must be at least 2 characters.")
+                return redirect("/submit")
             owner_name = request.form["owner_name"]
             location_text = request.form["location"]
             phone_number = request.form.get("phone_number")
             date_lost = request.form.get("date_lost")
             reward_raw = request.form.get("reward")
-            reward = float(reward_raw) if reward_raw else None
+            try:
+                reward = float(reward_raw) if reward_raw else None
+            except ValueError:
+                flash("Reward must be a number.")
+                return redirect("/submit")
             image = request.files.get("image")
     
             # Geocode using Google Maps
@@ -55,15 +76,7 @@ def submit_name():
 
             image_url = None
 
-            from azure.storage.blob import BlobServiceClient
-            import uuid
-            
-            # Setup (place this near the top of your file, after imports)
-            blob_connection_string = os.environ.get("AZURE_STORAGE_CONNECTION_STRING")
-            blob_container_name = "images"
-            blob_service_client = BlobServiceClient.from_connection_string(blob_connection_string)
-            container_client = blob_service_client.get_container_client(blob_container_name)
-            
+           
             # Inside your POST handler:
             if image and image.filename:
                 filename = secure_filename(image.filename)
@@ -89,10 +102,12 @@ def submit_name():
             db.session.commit()
             return redirect("/submit")
     
-        return render_template("form.html")
+        return render_template("form.html", google_api_key=os.environ.get("GOOGLE_GEOCODING_KEY"))
     except Exception as e:
         app.logger.error(f"Form submission error: {e}")
         return "Internal Server Error", 500
+
+    
 
 @app.route("/names", endpoint="show_names")
 def show_names():
