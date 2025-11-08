@@ -41,7 +41,12 @@
     <input type="tel" name="phone_number" required><br>
         
     <label>Location Lost:</label>
-    <input id="location" name="location" type="text" placeholder="Enter address" autocomplete="off"><br>
+    <input id="location" name="location" type="text" placeholder="Enter address" autocomplete="off">
+<input type="hidden" id="place_id" name="place_id">
+    <p id="selected-address" style="font-weight: bold; color: green;"></p>
+    <input type="hidden" id="formatted_address" name="formatted_address">
+
+<br>
     
     <label>Date Lost:</label>
     <input type="date" name="date_lost" required><br>
@@ -84,23 +89,26 @@
       componentRestrictions: { country: 'ca' }
     });
 
-    // autocomplete.addListener('place_changed', function () {
-    //  const place = autocomplete.getPlace();
-    //  if (!place.geometry) {
-    //    alert("Please select a valid address from the suggestions.");
-    //    input.value = '';
-    //  }
-    });
-
-    // Prevent premature validation
-    input.addEventListener('keydown', function (e) {
-      // Allow typing even if autocomplete hasn't resolved yet
-      if (e.key === 'Enter' && !autocomplete.getPlace()) {
-        e.preventDefault();
+    autocomplete.addListener('place_changed', function () {
+      const place = autocomplete.getPlace();
+      const placeIdField = document.getElementById('place_id');
+      const addressDisplay = document.getElementById('selected-address');
+    
+      if (place.geometry) {
+        placeIdField.value = place.place_id;
+        addressDisplay.textContent = "Selected: " + place.formatted_address;
+      } else {
+        alert("Please select a valid address from the suggestions.");
+        input.value = '';
+        placeIdField.value = '';
+        addressDisplay.textContent = '';
       }
     });
+
   }
 
+    document.getElementById('formatted_address').value = place.formatted_address;
+    
   google.maps.event.addDomListener(window, 'load', initAutocomplete);
 </script>
 
