@@ -93,21 +93,24 @@
       const place = autocomplete.getPlace();
       const placeIdField = document.getElementById('place_id');
       const addressDisplay = document.getElementById('selected-address');
+      const formattedAddressField = document.getElementById('formatted_address');
     
       if (place.geometry) {
         placeIdField.value = place.place_id;
+        formattedAddressField.value = place.formatted_address;
         addressDisplay.textContent = "Selected: " + place.formatted_address;
       } else {
         alert("Please select a valid address from the suggestions.");
         input.value = '';
         placeIdField.value = '';
+        formattedAddressField.value = '';
         addressDisplay.textContent = '';
       }
     });
 
+
   }
 
-    document.getElementById('formatted_address').value = place.formatted_address;
     
   google.maps.event.addDomListener(window, 'load', initAutocomplete);
 </script>
