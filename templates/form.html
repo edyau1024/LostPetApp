@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,11 +8,31 @@
     <script src="https://maps.googleapis.com/maps/api/js?key={{ google_api_key }}&libraries=places"></script>
 </head>
 <body>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class="flashes">
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<style>
+  .flashes {
+    color: red;
+    font-weight: bold;
+    list-style-type: none;
+    padding: 0;
+  }
+</style>
+
     <h1>Submit new pet</h1><br>
-    Enter pet name:<br>
+    
 <form method="POST" enctype="multipart/form-data">
     <label>Pet's Name:</label>
-    <input type="text" name="pet_name" required><br>
+    <input type="text" name="pet_name" required minlength="2"><br>
 
     <label>Owner's Name:</label>
     <input type="text" name="owner_name" required><br>
@@ -29,6 +52,21 @@
     <label>Upload Image:</label>
     <input type="file" name="image"><br>
 
+    <img id="preview" src="#" alt="Image preview" style="display:none; max-width:200px;"><br><br>
+
+<script>
+  document.querySelector('input[name="image"]').addEventListener('change', function (e) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const preview = document.getElementById('preview');
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+    };
+    reader.readAsDataURL(this.files[0]);
+  });
+</script>
+
+    
     <button type="submit">Submit</button>
 
 </form>
