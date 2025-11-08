@@ -74,12 +74,14 @@
     <a href="{{ url_for('home') }}">Back to Home</a>
 </body>
 
+
+
 <script>
   function initAutocomplete() {
     const input = document.getElementById('location');
     const autocomplete = new google.maps.places.Autocomplete(input, {
       types: ['geocode'],
-      componentRestrictions: { country: 'ca' } // restrict to Canada
+      componentRestrictions: { country: 'ca' }
     });
 
     autocomplete.addListener('place_changed', function () {
@@ -89,10 +91,19 @@
         input.value = '';
       }
     });
+
+    // Prevent premature validation
+    input.addEventListener('keydown', function (e) {
+      // Allow typing even if autocomplete hasn't resolved yet
+      if (e.key === 'Enter' && !autocomplete.getPlace()) {
+        e.preventDefault();
+      }
+    });
   }
 
   google.maps.event.addDomListener(window, 'load', initAutocomplete);
 </script>
+
 
     
 </html>
