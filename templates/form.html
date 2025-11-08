@@ -5,7 +5,17 @@
 <html>
 <head>
     <title>Submit Pet Name</title>
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_api_key }}&libraries=places"></script>
+    
+      <!-- Load Maps JavaScript API with Places and Web Components -->
+      <script
+        async
+        src="https://maps.googleapis.com/maps/api/js?key={{ google_api_key }}&libraries=places&v=beta"
+      ></script>
+      <script
+        async
+        src="https://maps.googleapis.com/maps/api/js?key={{ google_api_key }}&libraries=places&v=beta&modules=webcomponents"
+      ></script>
+
 </head>
 <body>
 
@@ -41,10 +51,17 @@
     <input type="tel" name="phone_number" required><br>
         
     <label>Location Lost:</label>
+    <gmp-place-autocomplete
+      id="autocomplete"
+      input-field-id="location"
+      componentRestrictions='{"country": "ca"}'
+    ></gmp-place-autocomplete>
+    
     <input id="location" name="location" type="text" placeholder="Enter address" autocomplete="off">
-<input type="hidden" id="place_id" name="place_id">
-    <p id="selected-address" style="font-weight: bold; color: green;"></p>
+    <input type="hidden" id="place_id" name="place_id">
     <input type="hidden" id="formatted_address" name="formatted_address">
+    <p id="selected-address" style="font-weight: bold; color: green;"></p>
+
 
 <br>
     
@@ -82,41 +99,29 @@
 
 
 <script>
-  function initAutocomplete() {
-    const input = document.getElementById('location');
-    const autocomplete = new google.maps.places.Autocomplete(input, {
-      types: ['geocode'],
-      componentRestrictions: { country: 'ca' }
-    });
+  window.addEventListener("DOMContentLoaded", function () {
+    const autocompleteEl = document.getElementById("autocomplete");
+    const inputEl = document.getElementById("location");
+    const placeIdField = document.getElementById("place_id");
+    const formattedAddressField = document.getElementById("formatted_address");
+    const addressDisplay = document.getElementById("selected-address");
 
-    autocomplete.addListener('place_changed', function () {
-      const place = autocomplete.getPlace();
-      const placeIdField = document.getElementById('place_id');
-      const addressDisplay = document.getElementById('selected-address');
-      const formattedAddressField = document.getElementById('formatted_address');
-    
-      if (place.geometry) {
-        placeIdField.value = place.place_id;
-        formattedAddressField.value = place.formatted_address;
-        addressDisplay.textContent = "Selected: " + place.formatted_address;
+    autocompleteEl.addEventListener("gmp-placeautocomplete-select", (event) => {
+      const place = event.detail;
+      if (place && place.placeId && place.formattedAddress) {
+        placeIdField.value = place.placeId;
+        formattedAddressField.value = place.formattedAddress;
+        addressDisplay.textContent = "Selected: " + place.formattedAddress;
       } else {
+        placeIdField.value = "";
+        formattedAddressField.value = "";
+        addressDisplay.textContent = "";
         alert("Please select a valid address from the suggestions.");
-        input.value = '';
-        placeIdField.value = '';
-        formattedAddressField.value = '';
-        addressDisplay.textContent = '';
       }
     });
-
-
-  }
-
-    
-  document.addEventListener('DOMContentLoaded', function () {
-  initAutocomplete();
-});
-
+  });
 </script>
+
 
 
     
