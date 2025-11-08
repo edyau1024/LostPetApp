@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Submit Pet Name</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_api_key }}&libraries=places"></script>
 </head>
 <body>
     <h1>Submit new pet</h1><br>
@@ -17,7 +18,7 @@
     <input type="tel" name="phone_number" required><br>
         
     <label>Location Lost:</label>
-    <input type="text" name="location" required><br>
+    <input id="location" name="location" type="text" placeholder="Enter address" required><br>
     
     <label>Date Lost:</label>
     <input type="date" name="date_lost" required><br>
@@ -34,4 +35,26 @@
     <br>
     <a href="{{ url_for('home') }}">Back to Home</a>
 </body>
+
+<script>
+  function initAutocomplete() {
+    const input = document.getElementById('location');
+    const autocomplete = new google.maps.places.Autocomplete(input, {
+      types: ['geocode'],
+      componentRestrictions: { country: 'ca' } // restrict to Canada
+    });
+
+    autocomplete.addListener('place_changed', function () {
+      const place = autocomplete.getPlace();
+      if (!place.geometry) {
+        alert("Please select a valid address from the suggestions.");
+        input.value = '';
+      }
+    });
+  }
+
+  google.maps.event.addDomListener(window, 'load', initAutocomplete);
+</script>
+
+    
 </html>
