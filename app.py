@@ -2,13 +2,12 @@ import os
 from flask import Flask, request, redirect, render_template, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "default-secret")
 
 
-
-app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/site/wwwroot/names.db'
 
 UPLOAD_FOLDER = 'static/uploads'
@@ -22,12 +21,14 @@ class NameEntry(db.Model):
     pet_name = db.Column(db.String(100), nullable=False)
     owner_name = db.Column(db.String(100), nullable=False)
     location = db.Column(db.String(100), nullable=False)
+    formatted_address = db.Column(db.String(200), nullable=True)
     lat = db.Column(db.Float)
     lng = db.Column(db.Float)
     image_filename = db.Column(db.String(200))
     phone_number = db.Column(db.String(20), nullable=True)
     date_lost = db.Column(db.String(20), nullable=True)  # Use db.Date if you want strict date handling
     reward = db.Column(db.Float, nullable=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 with app.app_context():
     db.create_all()
@@ -62,6 +63,11 @@ def submit_name():
             if not geocode_result:
                 flash("Please select a valid address from the suggestions.")
                 return redirect("/submit")
+            place_id = request.form.get("place_id")
+            if not place_id:
+                flash("Please select a suggested address from the dropdown.")
+                return redirect("/submit")
+            formatted_address = request.form.get("formatted_address")
 
             phone_number = request.form.get("phone_number")
             date_lost = request.form.get("date_lost")
@@ -74,13 +80,10 @@ def submit_name():
             image = request.files.get("image")
     
             # Geocode using Google Maps
-            geocode_result = gmaps.geocode(location_text)
             lat = lng = None
             if geocode_result:
                 lat = geocode_result[0]["geometry"]["location"]["lat"]
                 lng = geocode_result[0]["geometry"]["location"]["lng"]
-            else:
-                app.logger.warning(f"No geocode result for: {location_text}")
 
             image_url = None
 
@@ -99,6 +102,7 @@ def submit_name():
                 pet_name=pet_name,
                 owner_name=owner_name,
                 location=location_text,
+                formatted_address=formatted_address,
                 lat=lat,
                 lng=lng,
                 image_filename=image_url,
@@ -108,11 +112,12 @@ def submit_name():
             )
             db.session.add(new_entry)
             db.session.commit()
+            app.logger.info(f"New entry submitted: {pet_name} at {location_text}")
             return redirect("/submit")
     
         return render_template("form.html", google_api_key=os.environ.get("GOOGLE_GEOCODING_KEY"))
     except Exception as e:
-        app.logger.error(f"Form submission error: {e}")
+        app.logger.info(f"New entry: {pet_name} by {owner_name}, lost at {formatted_address}, reward: {reward}")
         return "Internal Server Error", 500
 
     
