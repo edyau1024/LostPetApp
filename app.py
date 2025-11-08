@@ -57,7 +57,12 @@ def submit_name():
                 flash("Pet name must be at least 2 characters.")
                 return redirect("/submit")
             owner_name = request.form["owner_name"]
-            location_text = request.form["location"]
+            location_text = request.form.get("location", "").strip()
+            geocode_result = gmaps.geocode(location_text)
+            if not geocode_result:
+                flash("Please select a valid address from the suggestions.")
+                return redirect("/submit")
+
             phone_number = request.form.get("phone_number")
             date_lost = request.form.get("date_lost")
             reward_raw = request.form.get("reward")
