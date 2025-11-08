@@ -1,9 +1,10 @@
 from flask import flash
+import os
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "default-secret")
 from flask import Flask, request, redirect, render_template, url_for
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
-import os
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/site/wwwroot/names.db'
