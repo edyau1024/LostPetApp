@@ -48,9 +48,11 @@ blob_container_name = "images"
 blob_service_client = BlobServiceClient.from_connection_string(blob_connection_string)
 container_client = blob_service_client.get_container_client(blob_container_name)
 
+
 @app.route('/test-static')
 def test_static():
-    return send_from_directory('static', 'TestAutocomplete.html')
+    static_dir = os.path.join(app.root_path, 'static')
+    return send_from_directory(static_dir, 'TestAutocomplete.html')
 
 
 # recreate database
