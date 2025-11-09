@@ -53,6 +53,7 @@ def init_db():
         with app.app_context():
             db.create_all()
             app.logger.info("db.create_all() executed")
+            app.logger.info(f"DB path: {app.config['SQLALCHEMY_DATABASE_URI']}")
         return "Database initialized."
     except Exception as e:
         app.logger.error(f"init-db error: {e}")
