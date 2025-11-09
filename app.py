@@ -75,18 +75,27 @@ def submit_name():
             location_text = request.form.get("location", "").strip()
             app.logger.info(f"Geocoding input: '{location_text}'")
 
+            place_id = request.form.get("place_id")
+            formatted_address = request.form.get("formatted_address")
+            lat = lng = None
+            
+            if not place_id:
+                flash("Please select a suggested address from the dropdown.")
+                return redirect("/submit")
+            
             try:
-                geocode_result = gmaps.geocode(location_text)
-                if not geocode_result:
-                    flash("Please select a valid address from the suggestions.")
-                    return redirect("/submit")
-                formatted_address = geocode_result[0]["formatted_address"]
-                lat = geocode_result[0]["geometry"]["location"]["lat"]
-                lng = geocode_result[0]["geometry"]["location"]["lng"]
+                geocode_result = gmaps.place(place_id=place_id)
+                result = geocode_result.get("result", {})
+                location = result.get("geometry", {}).get("location", {})
+                lat = location.get("lat")
+                lng = location.get("lng")
+                if not formatted_address:
+                    formatted_address = result.get("formatted_address")
             except Exception as e:
-                app.logger.error(f"Geocoding failed: {e}")
+                app.logger.error(f"Geocoding failed for place_id {place_id}: {e}")
                 flash("Geocoding failed. Please try again.")
                 return redirect("/submit")
+    
 
             phone_number = request.form.get("phone_number")
             date_lost = request.form.get("date_lost")
