@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 from datetime import datetime
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "default-secret")
 
 
@@ -47,6 +47,11 @@ blob_connection_string = os.environ.get("AZURE_STORAGE_CONNECTION_STRING")
 blob_container_name = "images"
 blob_service_client = BlobServiceClient.from_connection_string(blob_connection_string)
 container_client = blob_service_client.get_container_client(blob_container_name)
+
+@app.route('/test-static')
+def test_static():
+    return send_from_directory('static', 'TestAutocomplete.html')
+
 
 # recreate database
 @app.route("/init-db")
