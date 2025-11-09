@@ -46,6 +46,14 @@ blob_container_name = "images"
 blob_service_client = BlobServiceClient.from_connection_string(blob_connection_string)
 container_client = blob_service_client.get_container_client(blob_container_name)
 
+// recreate database
+@app.route("/init-db")
+def init_db():
+    with app.app_context():
+        db.create_all()
+    return "Database initialized."
+
+
 @app.route("/submit", methods=["GET", "POST"])
 def submit_name():
     try:
