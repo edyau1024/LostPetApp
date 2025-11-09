@@ -49,14 +49,11 @@
         
     <label>Location Lost:</label>
 
-        
-    <!-- Input field managed by the component -->
-    <input id="location" name="location" type="text" placeholder="Enter address" autocomplete="off">
     
     <!-- Google Maps Autocomplete Component -->
     <gmp-place-autocomplete
       id="autocomplete"
-      input-field-id="location"
+      name="location"
       component-restrictions='{"country": "ca"}'
     ></gmp-place-autocomplete>
 
