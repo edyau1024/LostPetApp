@@ -36,20 +36,23 @@ jobs:
           name: python-app
           path: .
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: python-app
-          path: ./
+deploy:
+  runs-on: ubuntu-latest
+  needs: build
+  steps:
+    - name: Download and extract artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: python-app
+        path: ./python-app
 
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: 'LostPet'
-          slot-name: 'Production'
-          publish-profile: ${{ secrets.AzureAppService_PublishProfile_1234567890abcdef }}
-          package: .
+    - name: List artifact contents
+      run: ls -R ./python-app
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'LostPet'
+        slot-name: 'Production'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_1234567890abcdef }}
+        package: ./python-app
