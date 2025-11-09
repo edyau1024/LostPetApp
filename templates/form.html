@@ -103,13 +103,16 @@
 <script>
   window.addEventListener("DOMContentLoaded", function () {
     const autocompleteEl = document.getElementById("autocomplete");
-    const inputEl = document.getElementById("location");
     const placeIdField = document.getElementById("place_id");
     const formattedAddressField = document.getElementById("formatted_address");
     const addressDisplay = document.getElementById("selected-address");
 
     autocompleteEl.addEventListener("gmp-placeautocomplete-select", (event) => {
       const place = event.detail;
+
+        // ✅ Debug log to confirm event and data
+      console.log("Place selected:", place);
+
       if (place && place.placeId && place.formattedAddress) {
         placeIdField.value = place.placeId;
         formattedAddressField.value = place.formattedAddress;
