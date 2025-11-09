@@ -3,10 +3,10 @@ import sqlite3
 conn = sqlite3.connect("names.db")
 cursor = conn.cursor()
 
-cursor.execute("PRAGMA table_info(name_entry);")
-columns = cursor.fetchall()
-
-for col in columns:
-    print(col)
+print("Tables:")
+cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+tables = cursor.fetchall()
+for table in tables:
+    print(table)
 
 conn.close()
