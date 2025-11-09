@@ -30,8 +30,8 @@ class NameEntry(db.Model):
     reward = db.Column(db.Float, nullable=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-with app.app_context():
-    db.create_all()
+#with app.app_context():
+#    db.create_all()
 
 import googlemaps
 
