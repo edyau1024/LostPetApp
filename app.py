@@ -49,9 +49,15 @@ container_client = blob_service_client.get_container_client(blob_container_name)
 # recreate database
 @app.route("/init-db")
 def init_db():
-    with app.app_context():
-        db.create_all()
-    return "Database initialized."
+    try:
+        with app.app_context():
+            db.create_all()
+            app.logger.info("db.create_all() executed")
+        return "Database initialized."
+    except Exception as e:
+        app.logger.error(f"init-db error: {e}")
+        return f"Error: {e}", 500
+
 
 
 @app.route("/submit", methods=["GET", "POST"])
