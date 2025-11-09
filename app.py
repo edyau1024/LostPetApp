@@ -164,7 +164,5 @@ def delete_entry(id):
 @app.route("/ping")
 def ping():
     return "pong"
-    
-if __name__ == '__main__':
-    app.run()
+ 
 
