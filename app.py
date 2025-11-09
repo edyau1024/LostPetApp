@@ -30,9 +30,11 @@ class NameEntry(db.Model):
     reward = db.Column(db.Float, nullable=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
+
 #with app.app_context():
 #    db.create_all()
 
+    
 import googlemaps
 
 gmaps = googlemaps.Client(key=os.environ.get("GOOGLE_GEOCODING_KEY"))
@@ -60,29 +62,31 @@ def init_db():
         return f"Error: {e}", 500
 
 
-
 @app.route("/submit", methods=["GET", "POST"])
 def submit_name():
     try:
         if request.method == "POST":
             pet_name = request.form.get("pet_name", "").strip()
-            if not pet_name:
-                flash("Pet name is required.")
+            if not pet_name or len(pet_name) < 2:
+                flash("Pet name is required and must be at least 2 characters.")
                 return redirect("/submit")
-            if len(pet_name) < 2:
-                flash("Pet name must be at least 2 characters.")
-                return redirect("/submit")
+
             owner_name = request.form["owner_name"]
             location_text = request.form.get("location", "").strip()
-            geocode_result = gmaps.geocode(location_text)
-            if not geocode_result:
-                flash("Please select a valid address from the suggestions.")
+            app.logger.info(f"Geocoding input: '{location_text}'")
+
+            try:
+                geocode_result = gmaps.geocode(location_text)
+                if not geocode_result:
+                    flash("Please select a valid address from the suggestions.")
+                    return redirect("/submit")
+                formatted_address = geocode_result[0]["formatted_address"]
+                lat = geocode_result[0]["geometry"]["location"]["lat"]
+                lng = geocode_result[0]["geometry"]["location"]["lng"]
+            except Exception as e:
+                app.logger.error(f"Geocoding failed: {e}")
+                flash("Geocoding failed. Please try again.")
                 return redirect("/submit")
-            place_id = request.form.get("place_id")
-            if not place_id:
-                flash("Please select a suggested address from the dropdown.")
-                return redirect("/submit")
-            formatted_address = request.form.get("formatted_address")
 
             phone_number = request.form.get("phone_number")
             date_lost = request.form.get("date_lost")
@@ -92,26 +96,15 @@ def submit_name():
             except ValueError:
                 flash("Reward must be a number.")
                 return redirect("/submit")
+
             image = request.files.get("image")
-    
-            # Geocode using Google Maps
-            lat = lng = None
-            if geocode_result:
-                lat = geocode_result[0]["geometry"]["location"]["lat"]
-                lng = geocode_result[0]["geometry"]["location"]["lng"]
-
             image_url = None
-
-           
-            # Inside your POST handler:
             if image and image.filename:
                 filename = secure_filename(image.filename)
                 unique_filename = f"{uuid.uuid4()}_{filename}"
                 blob_client = container_client.get_blob_client(unique_filename)
                 blob_client.upload_blob(image, overwrite=True)
                 image_url = f"https://{blob_service_client.account_name}.blob.core.windows.net/{blob_container_name}/{unique_filename}"
-            else:
-                image_url = None                        
 
             new_entry = NameEntry(
                 pet_name=pet_name,
@@ -127,12 +120,12 @@ def submit_name():
             )
             db.session.add(new_entry)
             db.session.commit()
-            app.logger.info(f"New entry submitted: {pet_name} at {location_text}")
+            app.logger.info(f"New entry submitted: {pet_name} at {formatted_address}")
             return redirect("/submit")
-    
+
         return render_template("form.html", google_api_key=os.environ.get("GOOGLE_GEOCODING_KEY"))
     except Exception as e:
-        app.logger.info(f"New entry: {pet_name} by {owner_name}, lost at {formatted_address}, reward: {reward}")
+        app.logger.error(f"Form submission error: {e}")
         return "Internal Server Error", 500
 
     
