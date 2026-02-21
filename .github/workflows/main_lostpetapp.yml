@@ -59,6 +59,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: python-app
+
+      # Make startup.sh executable INSIDE the artifact before deployment 
+      - name: Make startup.sh executable 
+        run: chmod +x startup.sh
       
       - name: Login to Azure
         uses: azure/login@v2
@@ -75,3 +79,4 @@ jobs:
           slot-name: 'Production'
           package: .
           
+
