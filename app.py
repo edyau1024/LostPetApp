@@ -26,7 +26,7 @@ class NameEntry(db.Model):
     lng = db.Column(db.Float)
     image_filename = db.Column(db.String(200))
     phone_number = db.Column(db.String(20), nullable=True)
-    date_lost = db.Column(db.String(20), nullable=True)  # Use db.Date if you want strict date handling
+    date_lost = db.Column(db.String(20), nullable=True)  # Use db.Date if you want strict date handling 
     reward = db.Column(db.Float, nullable=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
