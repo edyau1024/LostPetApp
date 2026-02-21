@@ -1,12 +1,14 @@
 import os
-from flask import Flask, request, redirect, render_template, url_for, flash
+from flask import Flask, request, redirect, render_template, url_for, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 from datetime import datetime
+import googlemaps
+from azure.storage.blob import BlobServiceClient
+import uuid
 
 app = Flask(__name__, static_folder='static')
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "default-secret")
-
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/site/wwwroot/names.db'
 
@@ -26,36 +28,32 @@ class NameEntry(db.Model):
     lng = db.Column(db.Float)
     image_filename = db.Column(db.String(200))
     phone_number = db.Column(db.String(20), nullable=True)
-    date_lost = db.Column(db.String(20), nullable=True)  # Use db.Date if you want strict date handling 
+    date_lost = db.Column(db.String(20), nullable=True)
     reward = db.Column(db.Float, nullable=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
+# -------------------------------
+# SAFE GOOGLE MAPS CLIENT LOADER
+# -------------------------------
+def get_gmaps():
+    key = os.environ.get("GOOGLE_GEOCODING_KEY")
+    if not key:
+        raise RuntimeError("GOOGLE_GEOCODING_KEY is missing")
+    return googlemaps.Client(key=key)
 
-#with app.app_context():
-#    db.create_all()
-
-    
-import googlemaps
-
-gmaps = googlemaps.Client(key=os.environ.get("GOOGLE_GEOCODING_KEY"))
-
-from azure.storage.blob import BlobServiceClient
-import uuid
-
-# Setup (place this near the top of your file, after imports)
+# -------------------------------
+# BLOB STORAGE SETUP
+# -------------------------------
 blob_connection_string = os.environ.get("AZURE_STORAGE_CONNECTION_STRING")
 blob_container_name = "images"
 blob_service_client = BlobServiceClient.from_connection_string(blob_connection_string)
 container_client = blob_service_client.get_container_client(blob_container_name)
-
 
 @app.route('/test-static')
 def test_static():
     static_dir = os.path.join(app.root_path, 'static')
     return send_from_directory(static_dir, 'TestAutocomplete.html')
 
-
-# recreate database
 @app.route("/init-db")
 def init_db():
     try:
@@ -67,7 +65,6 @@ def init_db():
     except Exception as e:
         app.logger.error(f"init-db error: {e}")
         return f"Error: {e}", 500
-
 
 @app.route("/submit", methods=["GET", "POST"])
 def submit_name():
@@ -85,12 +82,13 @@ def submit_name():
             place_id = request.form.get("place_id")
             formatted_address = request.form.get("formatted_address")
             lat = lng = None
-            
+
             if not place_id:
                 flash("Please select a suggested address from the dropdown.")
                 return redirect("/submit")
-            
+
             try:
+                gmaps = get_gmaps()
                 geocode_result = gmaps.place(place_id=place_id)
                 result = geocode_result.get("result", {})
                 location = result.get("geometry", {}).get("location", {})
@@ -102,7 +100,6 @@ def submit_name():
                 app.logger.error(f"Geocoding failed for place_id {place_id}: {e}")
                 flash("Geocoding failed. Please try again.")
                 return redirect("/submit")
-    
 
             phone_number = request.form.get("phone_number")
             date_lost = request.form.get("date_lost")
@@ -144,8 +141,6 @@ def submit_name():
         app.logger.error(f"Form submission error: {e}")
         return "Internal Server Error", 500
 
-    
-
 @app.route("/names", endpoint="show_names")
 def show_names():
     entries = NameEntry.query.all()
@@ -163,6 +158,7 @@ def home():
 @app.route("/test-geocode")
 def test_geocode():
     try:
+        gmaps = get_gmaps()
         result = gmaps.geocode("123 Main St, Vancouver, BC")
         app.logger.info(f"Test geocode result: {result}")
         return str(result[0]["geometry"]["location"])
@@ -176,9 +172,7 @@ def delete_entry(id):
     db.session.delete(entry)
     db.session.commit()
     return redirect(url_for('show_names'))
-    
+
 @app.route("/ping")
 def ping():
     return "pong"
- 
-
