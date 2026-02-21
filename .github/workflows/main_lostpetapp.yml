@@ -63,9 +63,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_2F1248487689442BB007724F84CAC97C }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_FF5E015C87A64AE59B311E1CF18FFEAB }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_CFA2B65CBE7F470E8B077F5F06AC699B }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_22C167055C724CF580F157581D1EB3DC }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_936998AA68364C959F47E9005E6A27D4 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_F53FADEE978D42AD9ACC04AD5DD1F688 }}
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
@@ -73,4 +73,4 @@ jobs:
         with:
           app-name: 'LostPetApp'
           slot-name: 'Production'
-          package: .
+          
