@@ -44,10 +44,14 @@ def get_gmaps():
 # -------------------------------
 # BLOB STORAGE SETUP
 # -------------------------------
-blob_connection_string = os.environ.get("AZURE_STORAGE_CONNECTION_STRING")
-blob_container_name = "images"
-blob_service_client = BlobServiceClient.from_connection_string(blob_connection_string)
-container_client = blob_service_client.get_container_client(blob_container_name)
+BLOB_CONTAINER_NAME = "images"
+
+def get_blob_container():
+    conn_str = os.environ.get("AZURE_STORAGE_CONNECTION_STRING")
+    if not conn_str:
+        raise RuntimeError("AZURE_STORAGE_CONNECTION_STRING is missing")
+    blob_service_client = BlobServiceClient.from_connection_string(conn_str)
+    return blob_service_client, blob_service_client.get_container_client(BLOB_CONTAINER_NAME)
 
 @app.route('/test-static')
 def test_static():
@@ -115,9 +119,10 @@ def submit_name():
             if image and image.filename:
                 filename = secure_filename(image.filename)
                 unique_filename = f"{uuid.uuid4()}_{filename}"
+                blob_service_client, container_client = get_blob_container()
                 blob_client = container_client.get_blob_client(unique_filename)
                 blob_client.upload_blob(image, overwrite=True)
-                image_url = f"https://{blob_service_client.account_name}.blob.core.windows.net/{blob_container_name}/{unique_filename}"
+                image_url = f"https://{blob_service_client.account_name}.blob.core.windows.net/{BLOB_CONTAINER_NAME}/{unique_filename}"
 
             new_entry = NameEntry(
                 pet_name=pet_name,
