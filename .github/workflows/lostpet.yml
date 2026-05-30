@@ -52,7 +52,7 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'LostPet'
+          app-name: 'LostPetApp'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AzureAppService_PublishProfile_1234567890abcdef }}
           package: ./python-app
