@@ -71,6 +71,11 @@ def get_blob_container():
 # -------------------------------
 # ROUTES
 # -------------------------------
+
+@app.route("/")
+def home():
+    return render_template("home.html")
+
 @app.route('/test-static')
 def test_static():
     static_dir = os.path.join(app.root_path, 'static')
