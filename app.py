@@ -138,7 +138,7 @@ def submit_name():
 
             # (rest of your logic: file upload, blob storage, DB insert, redirect, etc.)
 
-        return render_template("submit.html")
+        return render_template("form.html")
     except Exception as e:
         app.logger.error(f"/submit error: {e}")
         return "Internal Server Error", 500
