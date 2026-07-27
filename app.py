@@ -109,9 +109,23 @@ def submit_name():
                 flash("Please select a suggested address from the dropdown.")
                 return redirect("/submit")
 
+            # --- FIXED BLOCK ---
             try:
                 gmaps = get_gmaps()
                 geocode_result = gmaps.place(place_id=place_id)
                 result = geocode_result.get("result", {})
                 location = result.get("geometry", {}).get("location", {})
-                lat = location.get
+                lat = location.get("lat")
+                lng = location.get("lng")
+            except Exception as e:
+                app.logger.error(f"Geocoding error: {e}")
+                flash("There was a problem looking up that address.")
+                return redirect("/submit")
+            # --- END FIXED BLOCK ---
+
+            # (rest of your logic: file upload, blob storage, DB insert, redirect, etc.)
+
+        return render_template("submit.html")
+    except Exception as e:
+        app.logger.error(f"/submit error: {e}")
+        return "Internal Server Error", 500
