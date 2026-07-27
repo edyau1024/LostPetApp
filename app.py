@@ -72,13 +72,17 @@ def get_blob_container():
 # ROUTES
 # -------------------------------
 
-@app.route("/names")
-def show_names():
-    return render_template("names.html")
-
 @app.route("/")
 def home():
     return render_template("home.html")
+    
+@app.route("/names")
+def show_names():
+    return render_template("names.html")
+    
+@app.route("/form")
+def show_names():
+    return render_template("form.html")
 
 @app.route('/test-static')
 def test_static():
