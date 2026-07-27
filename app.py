@@ -1,10 +1,4 @@
 import os
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "names.db")
-
-app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DB_PATH}"
-
 from flask import Flask, request, redirect, render_template, url_for, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
@@ -13,13 +7,30 @@ import googlemaps
 from azure.storage.blob import BlobServiceClient
 import uuid
 
+# -------------------------------
+# PATHS
+# -------------------------------
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, "names.db")
+
+# -------------------------------
+# FLASK APP SETUP
+# -------------------------------
 app = Flask(__name__, static_folder='static')
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "default-secret")
 
+# Configure AFTER app is created
+app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DB_PATH}"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# Upload folder
 UPLOAD_FOLDER = 'static/uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+# -------------------------------
+# DATABASE
+# -------------------------------
 db = SQLAlchemy(app)
 
 class NameEntry(db.Model):
@@ -57,6 +68,9 @@ def get_blob_container():
     blob_service_client = BlobServiceClient.from_connection_string(conn_str)
     return blob_service_client, blob_service_client.get_container_client(BLOB_CONTAINER_NAME)
 
+# -------------------------------
+# ROUTES
+# -------------------------------
 @app.route('/test-static')
 def test_static():
     static_dir = os.path.join(app.root_path, 'static')
@@ -100,88 +114,4 @@ def submit_name():
                 geocode_result = gmaps.place(place_id=place_id)
                 result = geocode_result.get("result", {})
                 location = result.get("geometry", {}).get("location", {})
-                lat = location.get("lat")
-                lng = location.get("lng")
-                if not formatted_address:
-                    formatted_address = result.get("formatted_address")
-            except Exception as e:
-                app.logger.error(f"Geocoding failed for place_id {place_id}: {e}")
-                flash("Geocoding failed. Please try again.")
-                return redirect("/submit")
-
-            phone_number = request.form.get("phone_number")
-            date_lost = request.form.get("date_lost")
-            reward_raw = request.form.get("reward")
-            try:
-                reward = float(reward_raw) if reward_raw else None
-            except ValueError:
-                flash("Reward must be a number.")
-                return redirect("/submit")
-
-            image = request.files.get("image")
-            image_url = None
-            if image and image.filename:
-                filename = secure_filename(image.filename)
-                unique_filename = f"{uuid.uuid4()}_{filename}"
-                blob_service_client, container_client = get_blob_container()
-                blob_client = container_client.get_blob_client(unique_filename)
-                blob_client.upload_blob(image, overwrite=True)
-                image_url = f"https://{blob_service_client.account_name}.blob.core.windows.net/{BLOB_CONTAINER_NAME}/{unique_filename}"
-
-            new_entry = NameEntry(
-                pet_name=pet_name,
-                owner_name=owner_name,
-                location=location_text,
-                formatted_address=formatted_address,
-                lat=lat,
-                lng=lng,
-                image_filename=image_url,
-                phone_number=phone_number,
-                date_lost=date_lost,
-                reward=reward
-            )
-            db.session.add(new_entry)
-            db.session.commit()
-            app.logger.info(f"New entry submitted: {pet_name} at {formatted_address}")
-            return redirect("/submit")
-
-        return render_template("form.html", google_api_key=os.environ.get("GOOGLE_GEOCODING_KEY"))
-    except Exception as e:
-        app.logger.error(f"Form submission error: {e}")
-        return "Internal Server Error", 500
-
-@app.route("/names", endpoint="show_names")
-def show_names():
-    entries = NameEntry.query.all()
-    return render_template("names.html", entries=entries)
-
-@app.route('/')
-def home():
-    try:
-        entries = NameEntry.query.all()
-        return render_template("home.html", entries=entries)
-    except Exception as e:
-        app.logger.error(f"Home page error: {e}")
-        return "Internal Server Error", 500
-
-@app.route("/test-geocode")
-def test_geocode():
-    try:
-        gmaps = get_gmaps()
-        result = gmaps.geocode("123 Main St, Vancouver, BC")
-        app.logger.info(f"Test geocode result: {result}")
-        return str(result[0]["geometry"]["location"])
-    except Exception as e:
-        app.logger.error(f"Geocoding error: {e}")
-        return f"Geocoding error: {e}", 500
-
-@app.route('/delete/<int:id>', methods=['POST'])
-def delete_entry(id):
-    entry = NameEntry.query.get_or_404(id)
-    db.session.delete(entry)
-    db.session.commit()
-    return redirect(url_for('show_names'))
-
-@app.route("/ping")
-def ping():
-    return "pong"
+                lat = location.get
