@@ -79,10 +79,6 @@ def home():
 @app.route("/names")
 def show_names():
     return render_template("names.html")
-    
-@app.route("/form")
-def show_names():
-    return render_template("form.html")
 
 @app.route('/test-static')
 def test_static():
