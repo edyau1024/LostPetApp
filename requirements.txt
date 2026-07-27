@@ -1,5 +1,5 @@
 Flask
-Flask_SQLAlchemy
+Flask-SQLAlchemy
 gunicorn
 googlemaps
 azure-storage-blob
